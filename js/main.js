@@ -1,53 +1,102 @@
-let dataGlasses = [
-    { id: "G1", src: "./img/g1.jpg", virtualImg: "./img/v1.png", brand: "Armani Exchange", name: "Bamboo wood", color: "Brown", price: 150, description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis ea voluptates officiis? " },
-    { id: "G2", src: "./img/g2.jpg", virtualImg: "./img/v2.png", brand: "Arnette", name: "American flag", color: "American flag", price: 150, description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. In assumenda earum eaque doloremque, tempore distinctio." },
-    { id: "G3", src: "./img/g3.jpg", virtualImg: "./img/v3.png", brand: "Burberry", name: "Belt of Hippolyte", color: "Blue", price: 100, description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit." },
-    { id: "G4", src: "./img/g4.jpg", virtualImg: "./img/v4.png", brand: "Coarch", name: "Cretan Bull", color: "Red", price: 100, description: "In assumenda earum eaque doloremque, tempore distinctio." },
-    { id: "G5", src: "./img/g5.jpg", virtualImg: "./img/v5.png", brand: "D&G", name: "JOYRIDE", color: "Gold", price: 180, description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Error odio minima sit labore optio officia?" },
-    { id: "G6", src: "./img/g6.jpg", virtualImg: "./img/v6.png", brand: "Polo", name: "NATTY ICE", color: "Blue, White", price: 120, description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit." },
-    { id: "G7", src: "./img/g7.jpg", virtualImg: "./img/v7.png", brand: "Ralph", name: "TORTOISE", color: "Black, Yellow", price: 120, description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim sint nobis incidunt non voluptate quibusdam." },
-    { id: "G8", src: "./img/g8.jpg", virtualImg: "./img/v8.png", brand: "Polo", name: "NATTY ICE", color: "Red, Black", price: 120, description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit, unde enim." },
-    { id: "G9", src: "./img/g9.jpg", virtualImg: "./img/v9.png", brand: "Coarch", name: "MIDNIGHT VIXEN REMIX", color: "Blue, Black", price: 120, description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit consequatur soluta ad aut laborum amet." }
-];
+let dataGlasses = [];
 
-let btnSanPham = () => {
+let layData = () => {
+    return axios({
+        method: 'get',
+        url: 'https://6209b53592946600171c54c7.mockapi.io/Glasse',
+    })
+}
+
+let btnSanPham = (dataGlasses) => {
     let content = "";
     for (let sp of dataGlasses) {
+        let {id,src} = sp;
         content += `
-            <img class="col-4 image" style="cursor:pointer" src="${sp.src}">
+            <img class="col-4 image" style="cursor:pointer" src="${src}" onclick="clickImg(${id})">
         `
     }
     document.getElementById("vglassesList").innerHTML = content;
 }
-btnSanPham();
 
-let hienThiSanPham = () => {
-    let btnContainer = document.getElementById("vglassesList");
-    let btns = btnContainer.getElementsByClassName("image");
+let layDS = () => {
+    layData()
+    .then((result) => {
+        btnSanPham(result.data)
+    })
+    .catch((error) => {
+        console.log(error);
+    })
+}
+layDS();
+
+let setLocal = () => {
+    layData()
+    .then((result) => {
+        let dataGlasses = result.data;
+        localStorage.setItem("mangGlass",JSON.stringify(dataGlasses));
+    })
+    .catch((error) => {
+        console.log(error);
+    });
     
-    for (let i = 0; i<btns.length; i++) {
-        btns[i].addEventListener("click", function() {
-            let content = "";
-            let info = "";
-            for (let sp in dataGlasses) {
-                if(i == sp) {
-                    content = `
-                        <img src="${dataGlasses[sp].virtualImg}">
-                    `;
-                    info = `
-                        <h1>${dataGlasses[sp].name} - ${dataGlasses[sp].brand} 
-                        (${dataGlasses[sp].color})</h1>
-                        <span><p>$${dataGlasses[sp].price}</p> Stocking</span>
-                        <p>$${dataGlasses[sp].description}</p>
-                    `
-                }
-            }
-            // console.log(content);
-            document.getElementById("avatar").innerHTML = content;
-            document.getElementById("glassesInfo").innerHTML = info;
-            document.getElementById("glassesInfo").style.display = "block";
-        });
+    if(localStorage.getItem("mangGlass") != null) {
+        dataGlasses = JSON.parse(localStorage.getItem("mangGlass"));
     }
 }
+setLocal();
 
-hienThiSanPham();
+let glass = "";
+let clickImg = (id) => {
+    glass = dataGlasses.find(item => {
+        return item.id == id;
+    })
+    // console.log(glass);
+    let content = `
+        <img src="${glass.virtualImg}">
+    `;
+    let info = `
+        <h1>${glass.name} - ${glass.brand} 
+        (${glass.color})</h1>
+        <span><p>$${glass.price}</p> Stocking</span>
+        <p>$${glass.description}</p>
+    `
+    document.getElementById("avatar").innerHTML = content;
+    document.getElementById("glassesInfo").innerHTML = info;
+    document.getElementById("glassesInfo").style.display = "block";
+}
+window.clickImg = clickImg;
+
+// let hienThiSanPham = () => {
+//     let btnContainer = document.getElementById("vglassesList");
+//     let btns = document.querySelectorAll(".image");
+//     console.log(btns); //btns là 1 kiểu object: chỗ này chưa được làm rõ
+    
+//     for (let i = 0; i<btns.length; i++) {
+//         console.log(i);
+//         btns[i].addEventListener("click", function() {
+//             let content = "";
+//             let info = "";
+//             for (let sp of dataGlasses) {
+//                 let {id, src, virtualImg, brand, name, color, price, description} = sp;
+//                 if(i == id) {
+//                     content = `
+//                         <img src="${virtualImg}">
+//                     `;
+//                     info = `
+//                         <h1>${name} - ${brand} 
+//                         (${color})</h1>
+//                         <span><p>$${price}</p> Stocking</span>
+//                         <p>$${description}</p>
+//                     `
+//                 }
+//             }
+//             // console.log(content);
+//             document.getElementById("avatar").innerHTML = content;
+//             document.getElementById("glassesInfo").innerHTML = info;
+//             document.getElementById("glassesInfo").style.display = "block";
+//         });
+//     }
+// }
+
+// hienThiSanPham();
+
